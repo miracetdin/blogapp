@@ -1,0 +1,152 @@
+1. "django-admin startproject <projectname>" ile proje klasörü oluşturulur
+2. "python -m venv <envname>" ile workspace oluşturulur ve aktive edilir (oto ya da "<venvname>\Scripts\activate")
+3. "deactivate" ile env'den çıkılabilir.
+4. yeni app eklemek için üst klasörde "python manage.py startapp <appname>" komutu kullanılır
+5. eklenen app, ana app klasöründe "INSTALLED_APPS" bölümüne eklenir
+6. eklenen app için url ekleme aşamasında app'in klasöründe "urls.py" isimli dosya oluşturulur.
+    dosya içerisinde "urlpatterns=[]" isimli liste tanımlanır. aynı dizindeki view klasörü ve django.url dahil 
+    edilir. Bu dosyada url ile .html dosyası/yazı eşleşmesi yapılır.
+7. view dosyasında django.http.response import edilir. view ler oluşturulur.
+8. ana app klasöründeki urls.py dosyasında, oluşturulan app in urls.py dosyası dahil edilir.
+9. app ler içerisinde templates klasörü oluşturulur ve bu html sayfalarını içerir, bunları dahil etmek çin o app in
+    view dosyasında render metodu kullanılır. Bu metod, ana app in settings dosyasından dolayı tüm app lerin template
+    lerini arar ve verilen isimdeki html dosyasını bulmaya çalışır, templates/appname içerisine uygun html i oluşturup
+    render metodunun burayı aramasını sağlayarak her template e bakmasının önüne geçeriz
+10. eğer birden fazla html de kullanacağımız bir template kullanacaksak ana klasöre bir templates klasörü tanımlarız,
+    django bu klasörü taramaz; bunun için ana app içindeki settings -> TEMPATES -> DIRS e bu klasörü eklemek gerekir.
+    bu templates klasöründe html sayfalarının ortak içerikleri yer alır; ayrı içeriklerin ekleneceği alanlar 
+    {% block content %} --- {% endblock %} şeklinde gösterilir. block tanımlamaları ortak html dosyasında da bunu
+    kullanan html dosyalarında da kullanılır. Kullanan html dosyalarında en başa {% extends "base.html" %} eklenir.
+    bu tanımlarda content takma isimdir. title için {% block title %} kullanılabilir.
+11. css dosyaları app içerisine açılan static klasörüne eklenir href {% static 'style.css' %} olarak yazılır daha sonra
+    html dosyasının başına {% load static %} yazılır. css dosyası blog klasörüne dahil edilirse html e de bu şekilde 
+    eklemek gerecektir; okunabilirliği artırır. static dosyaları root klasör içinde static klasörü oluşturarak 
+    eklenebilir, bu durumda ana app klasöründeki settings dosyasında "STATIC_URL" nin altına "STATICFILES_DIRS"
+    eklenmelidir.
+12. farklı html dosyaları için css dosyası yazılacaksa base.html de bu alan {% block css_files %} ile işaretlenir
+    ayrı html dosyalarında yine bu etiketlerle belirlenen alanalrdan eklenebilir.
+13. bootstrap css ve js dosyaları root klasördeki static klasörünün içinde css ve js klasörlerine eklenir. daha sonra
+    base.html üzerinde kullanılarak tüm projeye etki etmesi sağlanır. bootstrap ile tasarım yapılır.
+14. partial templates: tasarımdaki bazı parçaların farklı html dosyalarında tutulması. root -> templates -> partials
+    içerisine base.html in parçaları yerleştirilebilir. isimlendirmesi "_part.html" şeklindedir. eğer app e özel
+    bir parçaysa app in templates klasörüne yazılabilir.
+15. linkler: "urls.py" dosyasındaki linklere isim verilir ve daha sonra html etiketine eklenir.
+16. dinamik veri: liste tanımlanabilir/veritabanı kullanılabilir. views içinde tanımlanan liste context olarak html
+    dosyalarına gönderilir. html sayfalarında {% for element in listname %} yapısı ile tekrarlanabilir. her bir
+    dinamik verinin taşıdığı string parametreyi vermek için |add filtersi (django filters) kullanılabilir. Alınan
+    id bilgisine göre view içerisinde blog seçilir. seçilen blog, blog_details sayfasına göndeirlerek bilgilerine
+    erişilebilir.
+17. veritabanı işlemleri için modeller oluşturulur. model sınıfları veritabanındaki tabloların koddaki karşılığıdır.
+    'python manage.py migrate' ile django nun daha önce oluşturduğu  migration işlemleri gerçekleştirilir; kodun 
+    model bölümündeki işlemler veritabanına aktarılır. kendi oluşturduğumuz modeller için 'python manage.py 
+    makemigrations' + 'python manage.py migrate' kullanılır.
+18. 1.  veritabanına shell aracılığıyla kayıt yapma:
+        python manage.py shell
+        >>> from blog.models import Blog
+        >>> b1 = Blog(title="Komple Web Geliştirme Kursu", image="web.png", is_active=True, is_home="True", description="HTML, CSS, JavaScript, .NET")
+        >>> b1.save()
+        >>> quit()
+        shell den çıkar
+    2.  modelden view e aktarım için model import edilir 'Blog.objects.all()' ile tüm kayıtlar alınır.
+19. admin uygulaması: django tarafından projeye eklenmiştir.
+    1.  terminalden admin oluşturma:
+        python manage.py createsuperuser
+        Username (leave blank to use 'miracetdin'): admin
+        Email address: info@admin.com
+        Password: password123
+    2.  admin sayfasına erişme ile kullanıcılar görüntülenebilir ve kaydedilebilir. (mirac password_123)
+    3.  blog -> admin.py içerisine modeller eklenenerek admin panelinde modellerdeki/veritabanındaki kayıtların
+        görüntülenmesi, kaydedilmesi, silinmesi ve güncellenmesi yapılabilir. self metodu ile modelin ismi 
+        olacak özellik seçilebilir. 
+    !   uygulama dili settings üzerinden değiştirebilir.
+    4.  özelleştirilmiş sınıflar ile admin panelinde modelin görünümü özelleştirilebilir. list_display gibi
+        metotlar sayesinde bu görünüm elde edilebilir.
+    5.  Halihazırda veritabanında bulunan tablolarda null=False bi alan oluşturmak istediğimizde migration
+        oluşturunca sorun yaşarız çünkü bu alanlar dolu olmayabilir, bu nedenle öncelikle slug özelliği
+        null=True olarak oluşturulur, migration işaretlenip veritabanına aktarılır ve sonrasında null=False
+        yapılır. slug alanı unique olmalıdır, kayıt id leri auto-incerement ile oluşturulur. slug alanı için
+        de indexleme yapılması için db_index=True yapılmalıdır. null=False ve default="" ile slug
+        oluşturulabilir ancak unique olması gerektiği için bu şekilde yapılmamalıdır. daha sonra veritabanı
+        üzerinde var olan kolonlar doldurulabilir.
+        ya da slugify yardımcı metotu kullanıabilir:
+            - slugify title a göre bir sug oluşturur
+            - models.py içinde save metotu ezilir; slugify kullanılarak slug oluşturulur
+            - slug alanı blank=True yapılır, bu sayede admin panelinde slug ifadesi girilmesine gerek kalmaz
+            - her bir blog için panel üzerinden kayıt yenilendiğinde slug oluşturulur
+            - daha sonra model.py da null=False yapılır, migrations 2.ignore seçilerek yapılır
+            - slug alanı elle eklenmediği için editable=False yapılır; panelde blog görünümüne eklenebilir
+            - readonly olarak eklenebilir, bu metot liste kabul ettiği için virgül kullanılmaldır
+20. url içerisinde slug kullanmal için urls.py içinde int:id değişkeni slug:slug olarak değiştirilir, 
+    views.py da blog_details metoduna slug verilecek ve seçilecek olan blog slug değerine göre seçilecektir.
+    _blog.html dosyasında ise artık id yerine slug kulanılacaktır.
+21. fotoğraf yüklemek için models.py içindeki image alanı imageField yapılır. upload_to="blogs" ile konum
+    belirtilir. root klaösrde gçrsel için klasör oluşturulur. settings içerisinde static bölümüne oluşturulan 
+    klasör tanıtılır, ve url bilgisi verilir. 
+    MEDIA_ROOT = BASE_DIR / "uploads"      -> klasör
+    MEDIA_URL = "/images/"                 -> takma konum bilgisi
+    bu şekilde bir görsel yüklendiğinde root taki uploads/blogs/ içine yüklenir. görsellerin site arayüzünde
+    görüntüenebilmesi için ana app urls.py dosyasında url patterns in sonuna 
+    from django.conf.urls.static import static
+    from django.conf import settings
+    "+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)" eklenir.  daha sonra _blog.html ve 
+    blog_details.html deki img etiketinin source u {{ blog.image.url }} olarak değiştirilir.
+22. description/textarea da yazılan yazıyı düzenlemek için html editor paketi 'ckeditor' yüklenir. 
+    settings -> INSTALLED_APPS içinde EN SONA eklenir. admin panelinden editöre ulaşarak istenen yazı yazılır.
+    etiketlerle oluşturulan formun sayfada görüntülenmesi için description ın çağrıldığı yerde |safe 
+    eklenmelidir. descriptionın bir kısmı görüntülenmek istenebilir bu durumda karakter sayısı sınırlanır
+    ancak etiketler de karakter olarak kabul edilir, etiketleri görmeden karakterleri sayarak gösteremesi
+    için '|striptags|slice:"0:50"' filtreleri eklenir.
+23. _categories.html dinamik hale getirilir. oluşturulan modelden alınan categories bilgisi context ile
+    sayfaya/linke gönderilir. gönderilen categories bilgileri {% include 'partials/_categories.html' %} ile
+    blogs ya da index sayfasında görüntülenebilir. kategori başlıklarının her harfini büyük yazmak için
+    |title filtersi kullanılabilir. (django built-in filters)
+24. kategoriler için sayfa ve link oluşturma:
+        urls.py içinde path tanımlanır
+        _categories.html de link slug ile tanımlanır.
+        views.py da kategori için metot tanımlanır.
+        kurs -> kategori (many-to-one)
+        models.py da Blog modeline category Foreign Key i eklenir.
+        FK sütunu tabloda boş bırakılamaz bir sütundur; daha önce eklenen blog bilgileri vardır bu nedenle
+        yeni sütun oluşturarak migration yapılırsa hata alınabilir. çözüm
+            - veritabanını silip sıfırdan migrations yapmak
+            - blog tablosunun kayıtları silinip tekrar -FK ile birlikte- oluşturulabilir
+            - null=True ile tabloya FK lar null olarak eklenir, FK değerleri girilir ve null=False yapılır
+            - default=1 ile tüm bloglar category=1 e atanır
+            - admin paneli ya da db üzerinden atamalar yapılabilir
+        admin.py içinde blog admin panelinde list_filter ile filtreleme yapılabilir
+        views.py de blogs_by_category isminde metot ile kategoriye göre sayfa oluşturulmuş olur.
+        eğer blog yoksa blogs sayfasında if kontrolü yapılır.
+25. seçilen kategoriyi işaretlemek için views.py içinde context e seçilen slug bilgisi eklenir. bu contexti 
+    okuyan _categories.html dosyasında slug bilgisi ile eşleşen kategori active edilir.
+26. kursLAR -> kategoriLER (many-to-many):
+    models.py içinde category-blogs ilişkisi many-to-many olarak tanımlanır. migrate edilir. bu durumda
+    blog tablosundaki category bilgisi silinir ve blog-category eşleştirmelerini tutan yeni bir tablo
+    oluşturulur. admin.py da BlogAdmin sınıfında list_display e categories eklenir, categories için fonksiyon
+    tanımlanır. fonksiyon blog nesnesi (obj) nin sahip olduğu her category nin name ini yaazar ve oluşturduğu
+    listeyi döner. listeyi html ile formatlı bir şekilde yazmak için mark_safe sayafay import edilir.
+    views.py da kategoriye göre blog seçiminde:
+        c = Category.objects.get(slug=slug) ile kategori seçilir
+        "blogs": c.blog_set.all() ile seçilen kategoriyi sağlayan bloglar alınır
+    Blog modeli içindeki categories e blank=True eklenerek admin panelinde bu alanın doldurulma zorunluluğu
+    kaldırılır.
+27. Authentication: admin (superuser) oluşturduğumuzda belli bir süre kadar bu yetkilendirilmiş hesap login 
+    durumu altif kalır, tarayıcıdaki sessionid cookie si ile. sessionid nin value değeri db tarafında
+    session_key ile aynıdır, bu session_key db deki expire_date e kadar saklanır.
+28. navbar da sağ tarafa login register logout welcome eklenir, kullanıcının giriş yapıp yapmama durumuna
+    göre aktif edilirler.
+29. account uygulaması 'python manage.py startapp account' komutu ile oluşturulur. app ismi ana app de
+    settings e eklenir. account app içinde urls.py ve views.py oluşturulur. view lerin ifade ettiği sayfaları
+    tanımlarız (html oluşturulur). sonra urls.py ana app teki urls.py a eklenir. url ler için ön ek ekenir:
+    account -> account/login. navbar da eklenen butonlar için linkler eklenir.
+30. login sayfasında kullanıcının girdiği bilgiler form ile alınır ve HTTP POST metodu ile server tarafına 
+    gönderilir. alınan bilgilerin kontrol etmek için aynı view üzerinde önce metot kontrol edilir. HTTP POST
+    metotu döndüyse usename ve password okunur ve user oluşturulur, oluşturulan user için Authentication 
+    işlemi login metoduyla yapılır; giriş sağlanır ya da hata mesajı döndürülür. eğer POST metodu değilse,
+    HTTP GET metotduysa aynı view metodundaki login.html döndüren render çalışır.  hata mesajı login.html
+    içinde yazdırılır. ayrıca güvenlik amaçlı csrf token da form içine eklenir.
+31. register sayfasıda (register.html) form oluşturulur ve kullanıcıdan bilgiler alınır. alınan bilgiler
+    views metotdu içinde kontrol edilir ve gereki durumlar için hata mesajı döndürülür. eğer hata yoksa
+    kullanıcı oluşturulur. create metodu şifreyi gizelemez; create_user ise şifreleyerek saklar.
+32. lofout için view de logout metodu kullanmak yeterlidir ancak logout olmuş kullanıcının tekrar login
+    sayfasına (url yardımıyla) erişememesi için authenticate durumu kontrol edilmelidir.
+33. tasarım iyileştirme (blog_details)

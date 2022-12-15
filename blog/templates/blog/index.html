@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block css_files %}
+    <link rel="stylesheet" href="{% static 'blog/css/style.css' %}">
+{% endblock %}
+{% block title %} Homepage {% endblock %}
+{%  block content %}
+    <!-- başlık içeriye taşındı
+    <h1 style="color: red;">Homepage</h1> -->
+    <!-- blog app içinde
+    <img src="{% static 'blog/img/django.png' %}" alt="" width="150px"> -->
+    <!-- root klasörde
+    <img src="{% static 'img/django.png' %}" alt="Django" width="150px"> -->
+        <!-- <ul>
+        <li><a href="#">Home</a></li>
+        <li><a href="#">Blogs</a></li>
+        <li><a href="#">About</a></li>
+    </ul> -->
+    <!-- navbar partial olarak eklendi
+    <nav class="navbar navbar-dark bg-primary navbar-expand-lg">
+        <div class="container">
+            <a href="#" class="navbar-brand">BlogApp</a>
+            <ul class="navbar-nav me-auto">
+                <li class="nav-item">
+                    <a href="#" class="nav-link">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">Blogs</a>
+                </li>
+            </ul>
+        </div>
+    </nav> -->
+    {% include 'partials/_navbar.html' %}
+    <div class="container mt-3">
+        <div class="row">
+            <div class="col-3">
+                <!-- kategoriler partial olarak eklendi
+                <div class="list-group">
+                    <a href="#" class="list-group-item list-group-item-action">Programlama</a>
+                    <a href="#" class="list-group-item list-group-item-action">Web Programlama</a>
+                    <a href="#" class="list-group-item list-group-item-action">Mobil Programlama</a>
+                </div> -->
+                {% include 'partials/_categories.html' %}
+            </div>
+            <div class="col-9">
+                <h1>Homepage</h1>
+                <hr>
+                <!-- blog bilgileri/kartları partial olarak eklendi
+                <div class="card mb-3">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <img src="{% static 'img/web.png' %}" alt="" class="img-fluid">
+                        </div>
+                        <div class="col-md-9">
+                            <div class="card-body">
+                                <h5 class="card-title">Komple Web Geliştirme Kursu</h5>
+                                <p>Lorem ipsum dolor, sit amet consectetur adipisicing elit. Temporibus eligendi ab, omnis porro earum numquam.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card mb-3">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <img src="{% static 'img/python.png' %}" alt="" class="img-fluid">
+                        </div>
+                        <div class="col-md-9">
+                            <div class="card-body">
+                                <h5 class="card-title">Python Kursu</h5>
+                                <p>Lorem ipsum dolor, sit amet consectetur adipisicing elit. Temporibus eligendi ab, omnis porro earum numquam.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card mb-3">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <img src="{% static 'img/android.png' %}" alt="" class="img-fluid">
+                        </div>
+                        <div class="col-md-9">
+                            <div class="card-body">
+                                <h5 class="card-title">Android Uygulama Geliştirme Kursu</h5>
+                                <p>Lorem ipsum dolor, sit amet consectetur adipisicing elit. Temporibus eligendi ab, omnis porro earum numquam.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card mb-3">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <img src="{% static 'img/django.png' %}" alt="" class="img-fluid">
+                        </div>
+                        <div class="col-md-9">
+                            <div class="card-body">
+                                <h5 class="card-title">Django ile Web Geliştirme Kursu</h5>
+                                <p>Lorem ipsum dolor, sit amet consectetur adipisicing elit. Temporibus eligendi ab, omnis porro earum numquam.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div> -->
+                {% for blog in blogs %}
+                    {% if blog.is_home and blog.is_active %}
+                        {% include 'blog/partials/_blog.html' %}
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block js_files %}
+    <script src="{% static 'blog/js/script.js' %}"></script>
+{% endblock %}
